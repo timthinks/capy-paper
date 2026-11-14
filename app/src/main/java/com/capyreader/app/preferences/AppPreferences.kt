@@ -104,7 +104,7 @@ class AppPreferences(context: Context) {
             get() = preferenceStore.getInt("article_font_size", FontSize.DEFAULT)
 
         val fontFamily: Preference<FontOption>
-            get() = preferenceStore.getEnum("article_font_family", FontOption.default)
+            get() = preferenceStore.getEnum("article_font_family", FontOption.LITERATA)
 
         val topSwipeGesture: Preference<ArticleVerticalSwipe>
             get() = preferenceStore.getEnum(
@@ -149,7 +149,7 @@ class AppPreferences(context: Context) {
             get() = preferenceStore.getInt("article_title_font_size", FontSize.TITLE_DEFAULT)
 
         val titleFollowsBodyFont: Preference<Boolean>
-            get() = preferenceStore.getBoolean("article_title_follows_body_font", false)
+            get() = preferenceStore.getBoolean("article_title_follows_body_font", true)
     }
 
     class ArticleListOptions(private val preferenceStore: PreferenceStore) {
@@ -172,6 +172,9 @@ class AppPreferences(context: Context) {
                 "article_list_sort_order",
                 SortOrder.default
             )
+
+        val layout: Preference<ArticleListLayout>
+            get() = preferenceStore.getEnum("article_list_layout", ArticleListLayout.default)
 
         val showFeedName: Preference<Boolean>
             get() = preferenceStore.getBoolean("article_display_feed_name", true)

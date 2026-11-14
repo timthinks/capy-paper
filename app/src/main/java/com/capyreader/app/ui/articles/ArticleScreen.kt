@@ -90,6 +90,8 @@ import com.capyreader.app.ui.components.SearchState
 import com.capyreader.app.ui.provideLinkOpener
 import com.capyreader.app.ui.rememberDisplayTimeFormats
 import com.capyreader.app.ui.rememberLazyListState
+import com.capyreader.app.ui.rememberLazyStaggeredGridState
+import com.capyreader.app.preferences.ArticleListLayout
 import com.capyreader.app.ui.rememberLocalConnectivity
 import com.jocmp.capy.Article
 import com.jocmp.capy.ArticleFilter
@@ -228,6 +230,10 @@ fun ArticleScreen(
             setUpdatePasswordDialogOpen(true)
         }
         val listState = articles.rememberLazyListState()
+        val gridState = articles.rememberLazyStaggeredGridState()
+        val listLayout by appPreferences.articleListOptions.layout.asState()
+        // Mark-read-on-scroll is driven by the list's scroll position, so it keeps the list layout.
+        val showMagazine = listLayout == ArticleListLayout.MAGAZINE && !viewModel.markReadOnScrollEnabled
 
         ResetScrollBehaviorEffect(
             listState = listState,
@@ -236,19 +242,33 @@ fun ArticleScreen(
 
         val scrollToTop = {
             coroutineScope.launch {
-                listState.scrollToItem(0)
+                if (showMagazine) {
+                    gridState.scrollToItem(0)
+                } else {
+                    listState.scrollToItem(0)
+                }
             }
         }
 
-        ScrollToSelectedArticleEffect(
-            selectedArticleKey = selectedArticleID,
-            articles = articles,
-            listState = listState,
-        )
+        if (!showMagazine) {
+            ScrollToSelectedArticleEffect(
+                selectedArticleKey = selectedArticleID,
+                articles = articles,
+                listState = listState,
+            )
+        }
 
         val newArticles = rememberNewArticlesIndicator(
             articles = presentedArticles,
-            listState = listState,
+            firstVisibleItem = {
+                if (showMagazine) {
+                    gridState.layoutInfo.visibleItemsInfo.minByOrNull { it.index }
+                        ?.let { FirstVisibleItem(index = it.index, key = it.key) }
+                } else {
+                    listState.layoutInfo.visibleItemsInfo.firstOrNull()
+                        ?.let { FirstVisibleItem(index = it.index, key = it.key) }
+                }
+            },
             enabled = !viewModel.markReadOnScrollEnabled,
         )
 
@@ -261,6 +281,7 @@ fun ArticleScreen(
         if (presentedFilter != scrolledFilter) {
             SideEffect {
                 listState.requestScrollToItem(0)
+                gridState.requestScrollToItem(0)
                 setScrolledFilter(presentedFilter)
             }
         }
@@ -621,6 +642,7 @@ fun ArticleScreen(
                                             contentPadding = PaddingValues(bottom = innerPadding.calculateBottomPadding()),
                                             selectedArticleKey = selectedArticleID,
                                             listState = listState,
+                                            gridState = if (showMagazine) gridState else null,
                                             enableMarkReadOnScroll = viewModel.markReadOnScrollEnabled,
                                             dimReadArticles = presentedArticles.filter.status != ArticleStatus.STARRED,
                                             showNewArticles = newArticles.isVisible,

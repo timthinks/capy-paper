@@ -26,6 +26,7 @@ import com.capyreader.app.ui.collectChangesWithCurrent
 import com.capyreader.app.ui.theme.colorschemes.BaseColorScheme
 import com.capyreader.app.ui.theme.colorschemes.MonochromeColorScheme
 import com.capyreader.app.ui.theme.colorschemes.NewsprintColorScheme
+import com.capyreader.app.ui.theme.colorschemes.PaperColorScheme
 import com.capyreader.app.ui.theme.colorschemes.SunsetColorScheme
 import com.capyreader.app.ui.theme.colorschemes.TachiyomiColorScheme
 import com.capyreader.app.ui.theme.colorschemes.applyPureBlack
@@ -114,6 +115,7 @@ private fun getThemeColorScheme(
 }
 
 private val colorSchemes: Map<AppTheme, BaseColorScheme> = mapOf(
+    AppTheme.PAPER to PaperColorScheme,
     AppTheme.DEFAULT to TachiyomiColorScheme,
     AppTheme.SUNSET to SunsetColorScheme,
     AppTheme.MONOCHROME to MonochromeColorScheme,

@@ -39,6 +39,10 @@ android {
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
+            all {
+                it.systemProperty("roborazzi.test.record", "true")
+                it.systemProperty("screenshots.dir", rootProject.file("screenshots").absolutePath)
+            }
         }
     }
 
@@ -52,6 +56,8 @@ android {
     productFlavors {
         create("free") {
             dimension = "license"
+            // Capy Paper ships under its own ID so it installs alongside Capy Reader
+            applicationId = "io.github.timthinks.capypaper"
             tasks
                 .named { name ->
                     !name.contains("Gplay") &&
@@ -180,6 +186,11 @@ dependencies {
     testImplementation(libs.tests.kotlinx.coroutines)
     testImplementation(libs.tests.mockk.mockk)
     testImplementation(libs.tests.robolectric)
+    testImplementation(libs.tests.roborazzi)
+    testImplementation(libs.tests.roborazzi.compose)
+    testImplementation(platform(libs.androidx.compose.bom))
+    testImplementation(libs.tests.androidx.ui.junit4)
+    testImplementation(libs.tests.androidx.ui.manifest)
     testImplementation(libs.tests.turbine)
     testImplementation(libs.tests.work.testing)
     androidTestImplementation(libs.tests.androidx.test.ext)

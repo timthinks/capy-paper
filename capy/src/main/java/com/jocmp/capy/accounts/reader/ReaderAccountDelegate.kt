@@ -315,7 +315,7 @@ internal class ReaderAccountDelegate(
             title = subscription.title,
             feed_url = subscription.feedURL,
             site_url = subscription.htmlUrl,
-            favicon_url = subscription.iconUrl?.ifBlank {
+            favicon_url = rebaseFreshRSSIconURL(subscription.iconUrl, preferences.url.get())?.ifBlank {
                 CapyLog.warn(tag("blank_icon"), mapOf("feed_url" to subscription.feedURL))
                 null
             },

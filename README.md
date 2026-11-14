@@ -1,3 +1,69 @@
+# Capy Paper
+
+A tablet-friendly fork of Capy Reader with a warm "Paper" theme, a masonry magazine view, and three list layouts.
+
+> [!IMPORTANT]
+> Capy Paper is a personal project, provided as-is with no warranty. Use it at your own risk. Not affiliated with Capy Reader or Current.
+>
+> Bug reports are welcome in GitHub Issues. Fixes are best-effort, with no promised timeline. For bugs that also happen in Capy Reader, please report them upstream.
+
+## Credit
+
+Capy Paper is a fork of [Capy Reader](https://github.com/jocmp/capyreader) by Josiah Campbell, licensed under GPL-3.0. Capy Paper is released under the same license. The design was inspired by the iOS reader Current.
+
+## Install
+
+- Download the APK from [GitHub Releases](../../releases), or
+- Add this repository to [Obtainium](https://github.com/ImranR98/Obtainium) to get updates automatically.
+
+Requires Android 11 or newer. Capy Paper uses its own app ID (`io.github.timthinks.capypaper`), so it installs alongside Capy Reader instead of replacing it.
+
+## What changed from upstream
+
+| Area | Change | Files |
+|---|---|---|
+| Theme | New default "Paper" theme: warm charcoal `#1C1914` + amber `#D3A573` (light: `#FAF6F5` + `#B86E2E`), inspired by Current | `ui/theme/colorschemes/PaperColorScheme.kt`, `preferences/ThemeOption.kt` |
+| List rows | Uppercase tracked source label, semibold title, serif muted excerpt, time + amber "Saved" meta line, rounded thumbnail, no leading favicon column, wider margins | `ui/articles/ArticleRow.kt`, `ui/articles/list/ArticleListItem.kt` |
+| Magazine view | Masonry grid (`LazyVerticalStaggeredGrid`); card size picked from content: FEATURE (image + long summary, full width, max one per 6 items), LARGE, PHOTO, TEXT, BRIEF. 2 columns portrait or in the two-pane list, up to 4 full-width landscape | `ui/articles/MagazineGrid.kt`, `ui/articles/ArticleList.kt` |
+| Compact list | Dense rows close to stock Capy: favicon, source + age on one line, headline only (2 lines), 56dp thumbnail beside both lines, tighter padding | `ui/articles/ArticleRow.kt` (`CompactArticleListItem`), `ui/articles/list/ArticleListItem.kt` (`compact`) |
+| Layout menu | Top-bar menu picks List / Compact / Magazine (global preference `article_list_layout`, default Magazine). Search results use List or Compact; Magazine falls back to List when mark-read-on-scroll is on | `ui/articles/list/ArticleListTopBar.kt`, `preferences/ArticleListLayout.kt` |
+| Reader | Literata serif body + titles by default; amber dot + uppercase source above the headline; links use the amber accent | `ui/articles/reader/ArticleHeader.kt`, `preferences/AppPreferences.kt` |
+| Unread counts | Hidden by default | `preferences/BadgeStyle.kt` |
+| FreshRSS icons | Feed icons served by FreshRSS (`f.php`) are rebased onto the address the account syncs with, so they load even when FreshRSS's configured base URL differs | `capy/.../accounts/reader/FreshRSSIconURL.kt`, `ReaderAccountDelegate.kt` |
+| App identity | Display name "Capy Paper", app ID `io.github.timthinks.capypaper` for the `free` flavor | `app/build.gradle.kts`, `res/values/strings.xml` |
+
+Paths are under `app/src/main/java/com/capyreader/app/` unless noted.
+
+## Build
+
+Open the project in Android Studio, or build from the command line with JDK 21 and the Android SDK:
+
+```bash
+./gradlew assembleFreeRelease   # needs your own release keystore and secrets.properties to sign
+./gradlew assembleFreeDebug     # debug build, no release keystore needed
+```
+
+## Screenshot tests
+
+`TabletScreenshotTest` renders the magazine and list layouts at tablet sizes with Robolectric + Roborazzi, so layouts can be reviewed without a device. Its fixtures (`app/src/test/resources/screenshot-fixtures/`) are not included in this repository, and the test skips when they are absent. Output goes to `screenshots/`.
+
+```bash
+./gradlew :app:testFreeDebugUnitTest --tests 'com.capyreader.app.ui.articles.TabletScreenshotTest'
+```
+
+## Syncing upstream
+
+Add Capy Reader as a remote and merge its `main`:
+
+```bash
+git remote add upstream https://github.com/jocmp/capyreader.git
+git fetch upstream && git merge upstream/main
+```
+
+Conflicts usually land in `ArticleRow.kt` and `ArticleList.kt`.
+
+---
+
 # Capy Reader
 
 <img src="./site/capy.png" width="100px">

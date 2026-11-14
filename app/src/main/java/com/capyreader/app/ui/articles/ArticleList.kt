@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.material3.MaterialTheme.motionScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,6 +38,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemKey
 import com.capyreader.app.R
 import com.capyreader.app.preferences.AppPreferences
+import com.capyreader.app.preferences.ArticleListLayout
 import com.capyreader.app.ui.isSinglePane
 import com.jocmp.capy.Article
 import com.jocmp.capy.MarkRead
@@ -56,6 +58,8 @@ fun ArticleList(
     showNewArticles: Boolean = false,
     scrollToTop: () -> Unit = {},
     contentPadding: PaddingValues = PaddingValues(),
+    /** When set, render the magazine grid with this state instead of the list. */
+    gridState: LazyStaggeredGridState? = null,
 ) {
     val articleOptions = rememberArticleOptions().copy(
         dim = dimReadArticles,
@@ -65,7 +69,17 @@ fun ArticleList(
     var listHeight by remember { mutableStateOf(0.dp) }
 
     Box(Modifier.fillMaxSize()) {
-        key(listState) {
+        if (gridState != null) {
+            MagazineGrid(
+                articles = articles,
+                gridState = gridState,
+                selectedArticleKey = selectedArticleKey,
+                onSelect = onSelect,
+                onMarkAllRead = onMarkAllRead,
+                dimReadArticles = dimReadArticles,
+                contentPadding = contentPadding,
+            )
+        } else key(listState) {
             ArticleListScrollbar(listState = listState) {
                 LazyColumn(
                     state = listState,
@@ -172,7 +186,7 @@ fun rememberCurrentTime(): LocalDateTime {
     LaunchedEffect(Unit) {
         while (true) {
             currentTime = LocalDateTime.now()
-            delay(30 * 60 * 1_000)
+            delay(60 * 1_000)
         }
     }
 
@@ -193,6 +207,7 @@ fun rememberArticleOptions(appPreferences: AppPreferences = koinInject()): Artic
     val shortenTitles by appPreferences.articleListOptions.shortenTitles.stateIn(scope)
         .collectAsState()
     val accentColors by appPreferences.accentColors.stateIn(scope).collectAsState()
+    val layout by appPreferences.articleListOptions.layout.stateIn(scope).collectAsState()
 
     return ArticleRowOptions(
         showSummary = showSummary,
@@ -202,5 +217,6 @@ fun rememberArticleOptions(appPreferences: AppPreferences = koinInject()): Artic
         fontScale = fontScale,
         shortenTitles = shortenTitles,
         accentColors = accentColors,
+        compact = layout == ArticleListLayout.COMPACT,
     )
 }

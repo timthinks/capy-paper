@@ -28,15 +28,19 @@ fun ArticleListItem(
     supportingContent: @Composable() (() -> Unit)? = null,
     leadingContent: @Composable() (() -> Unit)? = null,
     trailingContent: @Composable() (() -> Unit)? = null,
-    colors: ListItemColors = ListItemDefaults.colors()
+    colors: ListItemColors = ListItemDefaults.colors(),
+    compact: Boolean = false,
 ) {
+    val spacing = if (compact) CompactSpacing else VerticalSpacing
+    val horizontalPadding = if (compact) CompactHorizontalPadding else VerticalPadding
+
     Surface(
         color = colors.containerColor,
     ) {
         val leadingSize = 16.dp
 
         val overlineStartPadding = if (leadingContent != null) {
-            leadingSize + VerticalPadding
+            leadingSize + spacing
         } else {
             0.dp
         }
@@ -45,13 +49,14 @@ fun ArticleListItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(
-                    top = TopPadding,
-                    start = VerticalPadding,
-                    end = VerticalSpacing + 4.dp,
-                    bottom = BottomPadding,
+                    top = if (compact) CompactTopPadding else TopPadding,
+                    start = horizontalPadding,
+                    end = spacing + 4.dp,
+                    bottom = if (compact) CompactBottomPadding else BottomPadding,
                 )
         ) {
-            overlineContent?.let {
+            // Compact rows tuck the overline into the text column so the thumbnail sits beside it.
+            overlineContent?.takeUnless { compact }?.let {
                 Row(Modifier.padding(start = overlineStartPadding)) {
                     ProvideTextStyleFromToken(
                         colors.overlineContentColor,
@@ -61,12 +66,21 @@ fun ArticleListItem(
                 }
             }
             Row(
-                horizontalArrangement = Arrangement.spacedBy(VerticalSpacing)
+                horizontalArrangement = Arrangement.spacedBy(spacing)
             ) {
                 leadingContent?.let {
                     Column(Modifier.size(leadingSize)) { it() }
                 }
                 Column(Modifier.weight(1f)) {
+                    overlineContent?.takeIf { compact }?.let {
+                        Row {
+                            ProvideTextStyleFromToken(
+                                colors.overlineContentColor,
+                                typography.labelSmall,
+                                it,
+                            )
+                        }
+                    }
                     ProvideTextStyleFromToken(
                         colors.contentColor,
                         typography.bodyLarge,
@@ -96,13 +110,21 @@ fun ArticleListItem(
     }
 }
 
-private val VerticalSpacing = 16.dp
+private val VerticalSpacing = 20.dp
 
-private val VerticalPadding = 16.dp
+private val VerticalPadding = 24.dp
 
-private val TopPadding = 8.dp
+private val TopPadding = 16.dp
 
-private val BottomPadding = 16.dp
+private val BottomPadding = 18.dp
+
+private val CompactSpacing = 14.dp
+
+private val CompactHorizontalPadding = 20.dp
+
+private val CompactTopPadding = 10.dp
+
+private val CompactBottomPadding = 12.dp
 
 @Composable
 private fun ProvideTextStyleFromToken(

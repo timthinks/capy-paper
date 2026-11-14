@@ -21,6 +21,7 @@ enum class ThemeMode {
 }
 
 enum class AppTheme {
+    PAPER,
     MONET,
     SUNSET,
     NEWSPRINT,
@@ -29,6 +30,7 @@ enum class AppTheme {
 
     val translationKey: Int
         get() = when (this) {
+            PAPER -> R.string.theme_paper
             MONET -> R.string.theme_dynamic
             DEFAULT -> R.string.theme_default
             SUNSET -> R.string.theme_sunset
@@ -49,7 +51,7 @@ enum class AppTheme {
     }
 
     companion object {
-        val default = MONET.normalized()
+        val default = PAPER
     }
 }
 

@@ -58,6 +58,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.capyreader.app.ui.theme.ReaderSerif
+import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.capyreader.app.R
 import com.capyreader.app.common.ImagePreview
@@ -91,6 +93,7 @@ data class ArticleRowOptions(
     val shortenTitles: Boolean = true,
     val accentColors: Boolean = false,
     val dim: Boolean = true,
+    val compact: Boolean = false,
 )
 
 @Composable
@@ -134,110 +137,131 @@ fun ArticleRow(
             article = article,
             outlined = selected && isMonochrome,
         ) {
-            ArticleListItem(
-                headlineContent = {
-                    if (article.title.isNotBlank()) {
-                        Text(
-                            article.title,
-                            maxLines = if (options.shortenTitles) 3 else Int.MAX_VALUE,
-                            overflow = TextOverflow.Ellipsis,
-                            fontWeight = if (deEmphasizeFontWeight) FontWeight.Light else FontWeight.Bold,
-                        )
-                    }
-                },
-                overlineContent = {
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 2.dp)
-                    ) {
-
-                        if (options.showFeedName) {
+            if (options.compact) {
+                CompactArticleListItem(
+                    article = article,
+                    imageURL = imageURL,
+                    currentTime = currentTime,
+                    feedNameColor = feedNameColor,
+                    deEmphasizeFontWeight = deEmphasizeFontWeight,
+                    options = options,
+                    colors = colors,
+                )
+            } else {
+                ArticleListItem(
+                    headlineContent = {
+                        if (article.title.isNotBlank()) {
                             Text(
-                                text = article.displayFeedName(LocalContext.current),
-                                color = feedNameColor,
-                                maxLines = 1,
+                                article.title,
+                                maxLines = if (options.shortenTitles) 3 else Int.MAX_VALUE,
                                 overflow = TextOverflow.Ellipsis,
-                                fontWeight = if (deEmphasizeFontWeight) FontWeight.Light else null,
-                                modifier = Modifier.weight(1f)
-                            )
-                            Spacer(Modifier.width(16.dp))
-                        }
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(2.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            if (article.starred) {
-                                Icon(
-                                    Icons.Rounded.Star,
-                                    contentDescription = null,
-                                    tint = feedNameColor,
-                                    modifier = Modifier
-                                        .width(12.dp.relative(options.fontScale))
-                                )
-                            }
-                            if (article.enclosureType == EnclosureType.AUDIO) {
-                                Icon(
-                                    Icons.Rounded.PlayArrow,
-                                    contentDescription = null,
-                                    tint = feedNameColor,
-                                    modifier = Modifier
-                                        .width(16.dp.relative(options.fontScale))
-                                        .padding(end = 2.dp)
-                                )
-                            }
-                            Text(
-                                text = relativeTime(
-                                    time = article.publishedAt,
-                                    currentTime = currentTime,
-                                    formats = LocalTimeFormats.current,
+                                style = LocalTextStyle.current.merge(MaterialTheme.typography.titleMedium).copy(
+                                    fontSize = 17.sp,
+                                    lineHeight = 23.sp,
                                 ),
-                                color = feedNameColor,
-                                maxLines = 1,
+                                fontWeight = if (deEmphasizeFontWeight) FontWeight.Light else FontWeight.SemiBold,
                             )
                         }
-                    }
-                },
-                supportingContent = {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(4.dp),
-                        modifier = Modifier.padding(vertical = 4.dp)
-                    ) {
-                        if (article.summary.isNotBlank() && options.showSummary) {
-                            Text(
-                                text = article.summary,
-                                maxLines = 2,
-                                overflow = TextOverflow.Ellipsis,
-                                fontWeight = if (deEmphasizeFontWeight) FontWeight.Light else null,
+                    },
+                    overlineContent = {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 4.dp)
+                        ) {
+                            if (options.showIcon) {
+                                FaviconBadge(article.faviconURL, size = 12.dp)
+                            }
+                            if (options.showFeedName) {
+                                Text(
+                                    text = article.displayFeedName(LocalContext.current).uppercase(),
+                                    color = feedNameColor,
+                                    style = LocalTextStyle.current.merge(MaterialTheme.typography.labelSmall).copy(
+                                        letterSpacing = 1.1.sp,
+                                    ),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    fontWeight = if (deEmphasizeFontWeight) FontWeight.Light else FontWeight.Medium,
+                                    modifier = Modifier.weight(1f, fill = false)
+                                )
+                            }
+                        }
+                    },
+                    supportingContent = {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(6.dp),
+                            modifier = Modifier.padding(top = 4.dp)
+                        ) {
+                            if (article.summary.isNotBlank() && options.showSummary) {
+                                Text(
+                                    text = article.summary,
+                                    maxLines = 3,
+                                    overflow = TextOverflow.Ellipsis,
+                                    style = LocalTextStyle.current.merge(MaterialTheme.typography.bodyMedium).copy(
+                                        fontFamily = ReaderSerif,
+                                        fontSize = 15.sp,
+                                        lineHeight = 21.sp,
+                                    ),
+                                    color = colorScheme.onSurfaceVariant.copy(alpha = if (dim) 0.6f else 1f),
+                                    fontWeight = if (deEmphasizeFontWeight) FontWeight.Light else null,
+                                )
+                            }
+                            if (imageURL != null && options.imagePreview == ImagePreview.LARGE) {
+                                ArticleImage(imageURL = imageURL, imagePreview = options.imagePreview)
+                            }
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(
+                                    text = riverTime(
+                                        publishedAt = article.publishedAt,
+                                        currentTime = currentTime,
+                                    ),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = feedNameColor,
+                                    maxLines = 1,
+                                )
+                                if (article.enclosureType == EnclosureType.AUDIO) {
+                                    Icon(
+                                        Icons.Rounded.PlayArrow,
+                                        contentDescription = null,
+                                        tint = feedNameColor,
+                                        modifier = Modifier.width(14.dp.relative(options.fontScale))
+                                    )
+                                }
+                                if (article.starred) {
+                                    Text(
+                                        text = "·",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = feedNameColor,
+                                    )
+                                    Text(
+                                        text = stringResource(R.string.article_saved_label),
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = colorScheme.primary,
+                                        maxLines = 1,
+                                    )
+                                }
+                            }
+                        }
+                    },
+                    leadingContent = null,
+                    trailingContent = if (imageURL != null && options.imagePreview.showInline()) {
+                        {
+                            ArticleImage(
+                                imageURL = imageURL,
+                                imagePreview = options.imagePreview
                             )
                         }
-                        if (imageURL != null && options.imagePreview == ImagePreview.LARGE) {
-                            ArticleImage(imageURL = imageURL, imagePreview = options.imagePreview)
-                        }
-                    }
-                },
-                leadingContent = if (options.showIcon) {
-                    {
-                        FaviconBadge(article.faviconURL)
-                    }
-                } else {
-                    null
-                },
-
-                trailingContent = if (imageURL != null && options.imagePreview.showInline()) {
-                    {
-                        ArticleImage(
-                            imageURL = imageURL,
-                            imagePreview = options.imagePreview
-                        )
-                    }
-                } else {
-                    null
-                },
-                colors = colors
-            )
+                    } else {
+                        null
+                    },
+                    colors = colors
+                )
+            }
 
             val articleActions = LocalArticleActions.current
 
@@ -271,6 +295,97 @@ fun ArticleRow(
     }
 }
 
+/**
+ * Dense row close to stock Capy Reader: favicon, source + age on one line, headline only,
+ * small square thumbnail.
+ */
+@Composable
+private fun CompactArticleListItem(
+    article: Article,
+    imageURL: String?,
+    currentTime: LocalDateTime,
+    feedNameColor: Color,
+    deEmphasizeFontWeight: Boolean,
+    options: ArticleRowOptions,
+    colors: ListItemColors,
+) {
+    ArticleListItem(
+        compact = true,
+        colors = colors,
+        leadingContent = if (options.showIcon) {
+            { FaviconBadge(article.faviconURL) }
+        } else {
+            null
+        },
+        overlineContent = if (options.showFeedName) {
+            {
+                Text(
+                    text = article.displayFeedName(LocalContext.current).uppercase(),
+                    color = feedNameColor,
+                    style = LocalTextStyle.current.merge(MaterialTheme.typography.labelSmall).copy(
+                        letterSpacing = 1.sp,
+                    ),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontWeight = if (deEmphasizeFontWeight) FontWeight.Light else FontWeight.Medium,
+                    modifier = Modifier.padding(bottom = 2.dp)
+                )
+            }
+        } else {
+            null
+        },
+        headlineContent = {
+            if (article.title.isNotBlank()) {
+                Text(
+                    article.title,
+                    maxLines = if (options.shortenTitles) 2 else Int.MAX_VALUE,
+                    overflow = TextOverflow.Ellipsis,
+                    style = LocalTextStyle.current.merge(MaterialTheme.typography.titleSmall).copy(
+                        fontSize = 15.sp,
+                        lineHeight = 20.sp,
+                    ),
+                    fontWeight = if (deEmphasizeFontWeight) FontWeight.Light else FontWeight.SemiBold,
+                )
+            }
+        },
+        supportingContent = {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(top = 4.dp)
+            ) {
+                Text(
+                    text = riverTime(publishedAt = article.publishedAt, currentTime = currentTime),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = feedNameColor,
+                    maxLines = 1,
+                )
+                if (article.enclosureType == EnclosureType.AUDIO) {
+                    Icon(
+                        Icons.Rounded.PlayArrow,
+                        contentDescription = null,
+                        tint = feedNameColor,
+                        modifier = Modifier.width(14.dp.relative(options.fontScale))
+                    )
+                }
+                if (article.starred) {
+                    Icon(
+                        Icons.Rounded.Star,
+                        contentDescription = null,
+                        tint = colorScheme.primary,
+                        modifier = Modifier.width(12.dp.relative(options.fontScale))
+                    )
+                }
+            }
+        },
+        trailingContent = if (imageURL != null && options.imagePreview != ImagePreview.NONE) {
+            { ArticleImage(imageURL = imageURL, imagePreview = ImagePreview.SMALL) }
+        } else {
+            null
+        },
+    )
+}
+
 @Composable
 private fun ArticleImage(
     imageURL: String,
@@ -297,7 +412,7 @@ private fun ArticleImage(
         contentDescription = null,
         contentScale = ContentScale.Crop,
         modifier = sizeModifier
-            .clip(MaterialTheme.shapes.small)
+            .clip(RoundedCornerShape(10.dp))
             .background(colorScheme.surfaceContainer)
     )
 }

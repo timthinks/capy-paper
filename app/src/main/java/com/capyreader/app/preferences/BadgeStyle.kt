@@ -16,6 +16,6 @@ enum class BadgeStyle {
 
     companion object {
         val default
-            get() = EXACT
+            get() = HIDDEN
     }
 }

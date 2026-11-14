@@ -1,7 +1,19 @@
 package com.capyreader.app.ui.articles.list
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.Dashboard
 import androidx.compose.material.icons.rounded.Menu
+import androidx.compose.material.icons.rounded.ViewAgenda
+import androidx.compose.material.icons.rounded.ViewHeadline
+import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Text
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -10,9 +22,15 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarDefaults.pinnedScrollBehavior
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.capyreader.app.R
+import com.capyreader.app.preferences.AppPreferences
+import com.capyreader.app.preferences.ArticleListLayout
+import org.koin.compose.koinInject
 import com.capyreader.app.ui.articles.FilterActionMenu
 import com.capyreader.app.ui.articles.FilterAppBarTitle
 import com.capyreader.app.ui.articles.listPaneInsets
@@ -63,6 +81,7 @@ fun ArticleListTopBar(
             }
         },
         actions = {
+            LayoutToggleButton()
             FilterActionMenu(
                 filter = filter,
                 currentFeed = currentFeed,
@@ -74,6 +93,50 @@ fun ArticleListTopBar(
         }
     )
 }
+
+@Composable
+private fun LayoutToggleButton(appPreferences: AppPreferences = koinInject()) {
+    val scope = rememberCoroutineScope()
+    val preference = appPreferences.articleListOptions.layout
+    val layout by preference.stateIn(scope).collectAsState()
+    var expanded by remember { mutableStateOf(false) }
+
+    Box {
+        IconButton(onClick = { expanded = true }) {
+            Icon(
+                imageVector = layout.icon,
+                contentDescription = stringResource(R.string.article_list_layout_menu)
+            )
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+        ) {
+            ArticleListLayout.entries.forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(stringResource(option.translationKey)) },
+                    leadingIcon = { Icon(imageVector = option.icon, contentDescription = null) },
+                    trailingIcon = if (option == layout) {
+                        { Icon(imageVector = Icons.Rounded.Check, contentDescription = null) }
+                    } else {
+                        null
+                    },
+                    onClick = {
+                        preference.set(option)
+                        expanded = false
+                    },
+                )
+            }
+        }
+    }
+}
+
+private val ArticleListLayout.icon: ImageVector
+    get() = when (this) {
+        ArticleListLayout.LIST -> Icons.Rounded.ViewAgenda
+        ArticleListLayout.COMPACT -> Icons.Rounded.ViewHeadline
+        ArticleListLayout.MAGAZINE -> Icons.Rounded.Dashboard
+    }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview

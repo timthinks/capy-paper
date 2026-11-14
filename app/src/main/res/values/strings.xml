@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">Capy Reader</string>
+    <string name="app_name" translatable="false">Capy Paper</string>
     <string name="add_feed_url_title">Feed or Website URL</string>
     <string name="add_feed_name_title">Name</string>
     <string name="add_feed_new_folder_title">New Folder</string>
@@ -391,4 +391,14 @@
     <string name="mark_read_position_toolbar">Toolbar</string>
     <string name="mark_read_position_floating_action_button">Floating Action Button</string>
     <string name="mark_all_read_button_position">Mark All Read Button Position</string>
+    <string name="article_list_layout_list">List</string>
+    <string name="article_list_layout_magazine">Magazine</string>
+    <string name="article_list_layout_compact">Compact</string>
+    <string name="article_list_layout_menu">Layout</string>
+    <string name="theme_paper">Paper</string>
+    <string name="article_saved_label">Saved</string>
+    <string name="river_time_now">just now</string>
+    <string name="river_time_minutes">%1$dm ago</string>
+    <string name="river_time_hours">%1$dh ago</string>
+    <string name="river_time_days">%1$dd ago</string>
 </resources>

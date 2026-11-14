@@ -1,6 +1,7 @@
 package com.capyreader.app.ui
 
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.paging.compose.LazyPagingItems
@@ -19,5 +20,14 @@ fun <T : Any> LazyPagingItems<T>.rememberLazyListState(): LazyListState {
         0 -> remember(this) { LazyListState(0, 0) }
         // Return rememberLazyListState (normal case).
         else -> androidx.compose.foundation.lazy.rememberLazyListState()
+    }
+}
+
+/** Same workaround as [rememberLazyListState] for the magazine grid. */
+@Composable
+fun <T : Any> LazyPagingItems<T>.rememberLazyStaggeredGridState(): LazyStaggeredGridState {
+    return when (itemCount) {
+        0 -> remember(this) { LazyStaggeredGridState() }
+        else -> androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState()
     }
 }

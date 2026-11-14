@@ -1,16 +1,19 @@
 package com.capyreader.app.ui.articles
 
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import com.jocmp.capy.articles.SortOrder
 import java.time.ZonedDateTime
+
+/** First visible row/card of whichever article layout (list or magazine) is on screen. */
+data class FirstVisibleItem(val index: Int, val key: Any)
 
 data class ListHead(val id: String, val publishedAt: ZonedDateTime)
 
@@ -46,12 +49,14 @@ class NewArticlesIndicator {
 @Composable
 fun rememberNewArticlesIndicator(
     articles: PresentedArticles,
-    listState: LazyListState,
+    firstVisibleItem: () -> FirstVisibleItem?,
     enabled: Boolean,
 ): NewArticlesIndicator {
     val indicator = remember(articles.filter, articles.sortOrder) { NewArticlesIndicator() }
     val items = articles.items
     val tracking = enabled && articles.sortOrder == SortOrder.NEWEST_FIRST
+    // Layout toggles swap which list/grid is on screen without restarting the effect below.
+    val currentFirstVisibleItem by rememberUpdatedState(firstVisibleItem)
 
     LaunchedEffect(indicator, items, tracking) {
         if (!tracking) {
@@ -63,7 +68,7 @@ fun rememberNewArticlesIndicator(
             val head = items.itemSnapshotList.firstOrNull()?.let {
                 ListHead(id = it.id, publishedAt = it.publishedAt)
             }
-            val firstVisible = listState.layoutInfo.visibleItemsInfo.firstOrNull()
+            val firstVisible = currentFirstVisibleItem()
             val presentedID = firstVisible?.let { items.itemSnapshotList.getOrNull(it.index)?.id }
 
             Triple(head, firstVisible?.key as? String, presentedID)

@@ -2,7 +2,9 @@ package com.capyreader.app.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import com.capyreader.app.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
@@ -31,4 +33,11 @@ val Typography = Typography(
         letterSpacing = 0.5.sp
     )
     */
+)
+
+/** Serif used for headlines in the magazine and list layouts. */
+val ReaderSerif = FontFamily(
+    Font(R.font.literata, FontWeight.Normal),
+    Font(R.font.literata, FontWeight.SemiBold),
+    Font(R.font.literata, FontWeight.Bold),
 )

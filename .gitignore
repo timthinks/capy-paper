@@ -50,3 +50,7 @@ TODO.md
 tmp/
 
 .claude/worktrees
+
+# Real-feed fixtures for local screenshot tests (not committed)
+app/src/test/resources/screenshot-fixtures/
+screenshots/
