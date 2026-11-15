@@ -7,6 +7,10 @@ A tablet-friendly fork of Capy Reader with a warm "Paper" theme, a masonry magaz
 >
 > Bug reports are welcome in GitHub Issues. Fixes are best-effort, with no promised timeline. For bugs that also happen in Capy Reader, please report them upstream.
 
+## Screenshots
+
+<img src="docs/screenshots/magazine-dark.png" width="380" alt="Magazine view, dark Paper theme"> <img src="docs/screenshots/list-light.png" width="380" alt="List view, light Paper theme">
+
 ## Credit
 
 Capy Paper is a fork of [Capy Reader](https://github.com/jocmp/capyreader) by Josiah Campbell, licensed under GPL-3.0. Capy Paper is released under the same license. The design was inspired by the iOS reader Current.
