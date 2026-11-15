@@ -9,7 +9,7 @@ A tablet-friendly fork of Capy Reader with a warm "Paper" theme, a masonry magaz
 
 ## Screenshots
 
-<img src="docs/screenshots/magazine-dark.png" width="380" alt="Magazine view, dark Paper theme"> <img src="docs/screenshots/list-light.png" width="380" alt="List view, light Paper theme">
+<img src="docs/screenshots/magazine-dark.png" width="260" alt="Magazine view, dark Paper theme"> <img src="docs/screenshots/reader-dark.png" width="260" alt="Reading an article, dark Paper theme"> <img src="docs/screenshots/list-light.png" width="260" alt="List view, light Paper theme">
 
 ## Credit
 
